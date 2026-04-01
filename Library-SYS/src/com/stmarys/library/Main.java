@@ -3,7 +3,7 @@ package com.stmarys.library;
 import javax.swing.SwingUtilities;
 
 /**
- * The main entry point for the Library Management System application.
+ * The main entry point for the Library Management System application..
  */
 public class Main {
 
