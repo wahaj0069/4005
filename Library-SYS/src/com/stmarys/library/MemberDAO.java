@@ -9,7 +9,6 @@ public class MemberDAO {
     private static final String DB_URL = "jdbc:sqlite:library.db";
 
     public MemberDAO() {
-        // This ensures the 'members' table exists.
         String createTableSQL = "CREATE TABLE IF NOT EXISTS members (" +
                 "member_id INTEGER PRIMARY KEY, " +
                 "name TEXT NOT NULL, " +

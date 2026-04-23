@@ -1,22 +1,32 @@
 package com.stmarys.library;
 
 import javax.swing.SwingUtilities;
+import java.util.Scanner;
 
-/**
- * The main entry point for the Library Management System application..
- */
 public class Main {
 
     public static void main(String[] args) {
-        // This is the standard, safe way to start a Swing GUI application.
-        // It ensures that all UI components are created and updated on the
-        // correct thread, preventing potential bugs and freezes.
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // Creates an instance of your main window and makes it visible.
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("Developed by Wahaj");
+        System.out.println("   ST MARY'S LIBRARY MANAGEMENT SYSTEM     ");
+        System.out.println("Welcome");
+        System.out.println("Select Interface Mode:");
+        System.out.println("1) Text Based Console ");
+        System.out.println("2) Graphical User Interface");
+        System.out.print("\nEnter choice (1-2): ");
+
+        String choice = scanner.nextLine();
+
+        if (choice.equals("1")) {
+            ConsoleInterface ui = new ConsoleInterface();
+            ui.start();
+        } else if (choice.equals("2")) {
+            SwingUtilities.invokeLater(() -> {
                 new MainFrame().setVisible(true);
-            }
-        });
+            });
+        } else {
+            System.out.println("Invalid selection, Exiting system.");
+        }
     }
 }

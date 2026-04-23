@@ -4,18 +4,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// This class is now correctly configured for the SQLite database.
 public class BookDAO {
 
-    // The connection URL for SQLite. This will create a file named "library.db".
     private static final String DB_URL = "jdbc:sqlite:library.db";
 
     public BookDAO() {
         try {
-            // The driver class name for the SQLite JDBC driver.
             Class.forName("org.sqlite.JDBC");
 
-            // Create the 'books' table if it doesn't already exist.
             try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
                 String createTableSQL = "CREATE TABLE IF NOT EXISTS books (" +
                         "book_id INTEGER PRIMARY KEY, " +
@@ -53,17 +49,13 @@ public class BookDAO {
         return bookList;
     }
 
-    // --- NEW SEARCH METHOD ---
     public List<Book> searchBooks(String searchTerm) throws SQLException {
         List<Book> bookList = new ArrayList<>();
-        // This SQL query looks for matches in either the title OR the author.
         String sql = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Set the search term for both placeholders, with '%' wildcards.
-            // This means it will find the term anywhere in the string.
             pstmt.setString(1, "%" + searchTerm + "%");
             pstmt.setString(2, "%" + searchTerm + "%");
 
@@ -113,7 +105,7 @@ public class BookDAO {
             pstmt.executeUpdate();
         }
     }
-        // NEW METHOD FOR BookDAO.java
+
     public void updateBookStatus(int bookId, String newStatus) throws SQLException {
         String sql = "UPDATE books SET availability_status = ? WHERE book_id = ?";
         try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {

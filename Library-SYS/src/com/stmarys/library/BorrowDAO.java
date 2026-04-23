@@ -2,7 +2,7 @@ package com.stmarys.library;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter; // Import the formatter
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,21 +50,17 @@ public class BorrowDAO {
         return DriverManager.getConnection(DB_URL);
     }
     
-    // --- UPDATED: To accept both manual dates ---
     public void borrowBook(int bookId, int memberId, String borrowDateStr, String dueDateStr) throws SQLException {
         String sql = "INSERT INTO borrowings (book_id, member_id, borrow_date, due_date, status) VALUES (?, ?, ?, ?, ?)";
         
-        // Define the user-facing format
         DateTimeFormatter userFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        // Parse the dates from the user's format
         LocalDate borrowDate = LocalDate.parse(borrowDateStr, userFormatter);
         LocalDate dueDate = LocalDate.parse(dueDateStr, userFormatter);
 
         try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, bookId);
             pstmt.setInt(2, memberId);
-            // Store in the standard, sortable YYYY-MM-DD format
             pstmt.setString(3, borrowDate.toString());
             pstmt.setString(4, dueDate.toString());
             pstmt.setString(5, "Borrowed");
@@ -72,7 +68,6 @@ public class BorrowDAO {
         }
     }
 
-    // (The rest of your BorrowDAO methods: listCurrentBorrowings, returnBook, searchCurrentBorrowings, etc. remain the same as the previous version)
     public List<Borrowing> listCurrentBorrowings() throws SQLException {
         List<Borrowing> borrowingList = new ArrayList<>();
         String sql = "SELECT b.borrow_id, b.book_id, bk.title, m.name, b.borrow_date, b.due_date " +
@@ -135,6 +130,32 @@ public class BorrowDAO {
                             rs.getString("due_date")
                     ));
                 }
+            }
+        }
+        return borrowingList;
+    }
+
+    public List<Borrowing> getOverdueBorrowings() throws SQLException {
+        List<Borrowing> borrowingList = new ArrayList<>();
+        String sql = "SELECT b.borrow_id, b.book_id, bk.title, m.name, b.borrow_date, b.due_date " +
+                     "FROM borrowings b " +
+                     "JOIN books bk ON b.book_id = bk.book_id " +
+                     "JOIN members m ON b.member_id = m.member_id " +
+                     "WHERE b.status = 'Borrowed' AND date(b.due_date) < date('now')";
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                borrowingList.add(new Borrowing(
+                        rs.getInt("borrow_id"),
+                        rs.getInt("book_id"),
+                        rs.getString("title"),
+                        rs.getString("name"),
+                        rs.getString("borrow_date"),
+                        rs.getString("due_date")
+                ));
             }
         }
         return borrowingList;

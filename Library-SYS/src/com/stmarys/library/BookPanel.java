@@ -27,13 +27,10 @@ public class BookPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- TOP PANEL FOR SEARCH, SORT, AND LOGO ---
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        // This sub-panel groups the search and sort controls together
         JPanel controlsPanel = new JPanel(new BorderLayout());
 
-        // Search panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchField = new JTextField(25);
         JButton searchButton = new JButton("Search");
@@ -43,7 +40,6 @@ public class BookPanel extends JPanel {
         searchPanel.add(searchButton);
         searchPanel.add(clearButton);
         
-        // Sort panel
         JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         String[] sortOptions = {
             "Default Order", 
@@ -56,23 +52,18 @@ public class BookPanel extends JPanel {
         sortPanel.add(new JLabel("Sort:"));
         sortPanel.add(sortComboBox);
 
-        // Add search and sort to the grouped controls panel
-        // **FIX 1: Changed searchPanel from WEST to CENTER**
         controlsPanel.add(searchPanel, BorderLayout.CENTER);
         controlsPanel.add(sortPanel, BorderLayout.EAST);
 
-        // Logo
         ImageIcon originalIcon = new ImageIcon("newlogo.png");
         Image scaledImage = originalIcon.getImage().getScaledInstance(-1, 60, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
         JLabel logoLabel = new JLabel(scaledIcon);
         logoLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
-        // Add the grouped controls and the logo to the main top panel
         topPanel.add(controlsPanel, BorderLayout.CENTER);
         topPanel.add(logoLabel, BorderLayout.EAST);
 
-        // --- CENTER TABLE ---
         String[] columnNames = {"ID", "Title", "Author", "Category", "Status"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -81,7 +72,6 @@ public class BookPanel extends JPanel {
         bookTable = new JTable(tableModel);
         bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // --- BOTTOM PANEL FOR ACTIONS & DEVELOPER CREDIT ---
         JPanel bottomPanel = new JPanel(new BorderLayout()); 
 
         JLabel creditLabel = new JLabel("Developed by: Wahaj Ibne Zahid");
@@ -97,16 +87,13 @@ public class BookPanel extends JPanel {
         bottomButtonPanel.add(deleteButton);
         bottomButtonPanel.add(updateButton);
         
-        // **FIX 2: Changed creditLabel from WEST to CENTER**
         bottomPanel.add(creditLabel, BorderLayout.CENTER);
         bottomPanel.add(bottomButtonPanel, BorderLayout.EAST);
 
-        // --- ADD PANELS TO LAYOUT ---
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(bookTable), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // --- ACTION LISTENERS ---
         loadAllBooks();
         searchButton.addActionListener(e -> performSearch());
         clearButton.addActionListener(e -> {
@@ -172,9 +159,17 @@ public class BookPanel extends JPanel {
                 }
             }
         });
+
+        this.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) { 
+                searchField.setText(""); 
+                loadAllBooks(); 
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {}
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {}
+        });
     }
     
-    // (The rest of the methods are unchanged)
     private void performSort() {
         String selectedSort = (String) sortComboBox.getSelectedItem();
         if (selectedSort == null) return;
@@ -187,6 +182,7 @@ public class BookPanel extends JPanel {
         }
         updateTable();
     }
+
     private void performSearch() {
         try {
             String searchTerm = searchField.getText();
@@ -197,6 +193,7 @@ public class BookPanel extends JPanel {
             updateTable();
         } catch (SQLException e) { JOptionPane.showMessageDialog(this, "Error during search: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE); }
     }
+
     private void loadAllBooks() {
         try {
             this.currentBookList = bookDAO.listBooks();
@@ -209,6 +206,7 @@ public class BookPanel extends JPanel {
             this.originalOrderList = new ArrayList<>();
         }
     }
+
     private void updateTable() {
         tableModel.setRowCount(0); 
         if (currentBookList != null) {
