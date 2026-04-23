@@ -13,7 +13,6 @@ public class Member {
         this.membershipStatus = membershipStatus;
     }
 
-    // --- Getters ---
     public int getMemberId() {
         return memberId;
     }
